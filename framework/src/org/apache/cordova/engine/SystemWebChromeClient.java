@@ -167,9 +167,29 @@ public class SystemWebChromeClient extends WebChromeClient {
     @Override
     public boolean onConsoleMessage(ConsoleMessage consoleMessage)
     {
-        if (consoleMessage.message() != null)
-            LOG.d(LOG_TAG, "%s: Line %d : %s" , consoleMessage.sourceId() , consoleMessage.lineNumber(), consoleMessage.message());
-         return super.onConsoleMessage(consoleMessage);
+      if (consoleMessage.message() != null){
+
+        String msg = String.format( "%s at %s:%d", consoleMessage.message(), consoleMessage.sourceId() , consoleMessage.lineNumber());
+
+        switch(consoleMessage.messageLevel()){
+          case TIP:
+            LOG.i(LOG_TAG, msg);
+            break;
+          case WARNING:
+            LOG.w(LOG_TAG, msg);
+            break;
+          case ERROR:
+            LOG.e(LOG_TAG, msg);
+            break;
+          case DEBUG:
+          case LOG:
+            LOG.d(LOG_TAG, msg);
+            break;
+          default:
+            LOG.v(LOG_TAG, msg);
+        }
+      }
+      return super.onConsoleMessage(consoleMessage);
     }
 
     @Override
