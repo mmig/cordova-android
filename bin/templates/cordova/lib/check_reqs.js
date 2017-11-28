@@ -99,8 +99,13 @@ module.exports.get_gradle_wrapper = function () {
     var i = 0;
     var foundStudio = false;
     var program_dir;
-    // OK, This hack only works on Windows, not on Mac OS or Linux.  We will be deleting this eventually!
-    if (module.exports.isWindows()) {
+    // CB-12677: check if gradle path was explicitly set via environment variable
+    if (process.env['GRADLE_HOME']) {
+
+        return path.join(process.env['GRADLE_HOME'], 'bin', 'gradle');
+
+    } else if (module.exports.isWindows()) {
+        // OK, This hack only works on Windows, not on Mac OS or Linux.  We will be deleting this eventually!
 
         var result = child_process.spawnSync(path.join(__dirname, 'getASPath.bat'));
         // console.log('result.stdout =' + result.stdout.toString());
@@ -149,8 +154,8 @@ module.exports.check_gradle = function () {
     if (gradlePath.length !== 0) { d.resolve(gradlePath); } else {
         d.reject(new CordovaError('Could not find an installed version of Gradle either in Android Studio,\n' +
                                 'or on your system to install the gradle wrapper. Please include gradle \n' +
-                                'in your path, or install Android Studio, or set up \'ANDROID_STUDIO_HOME\'\n' +
-                                'env variable.'));
+                                'in your path, or install Android Studio, or set up \'GRADLE_HOME\' env \n' +
+                                'variable.'));
     }
     return d.promise;
 };
